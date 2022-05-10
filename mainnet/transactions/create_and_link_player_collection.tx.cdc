@@ -1,6 +1,6 @@
 import NonFungibleToken from 0x1d7e57aa55817448
 import MetadataViews from 0x1d7e57aa55817448
-import MFLPlayer from 0x9c5e6d2998489e48
+import MFLPlayer from 0x8ebcbfd516b1da27
 
 /** 
   This tx creates a Player NFT collection

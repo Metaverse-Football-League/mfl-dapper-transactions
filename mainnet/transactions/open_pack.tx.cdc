@@ -1,7 +1,7 @@
 import NonFungibleToken from 0x1d7e57aa55817448
 import MetadataViews from 0x1d7e57aa55817448
-import MFLPack from 0x9c5e6d2998489e48
-import MFLPlayer from 0x9c5e6d2998489e48
+import MFLPack from 0x8ebcbfd516b1da27
+import MFLPlayer from 0x8ebcbfd516b1da27
 
 /**
   This tx opens a pack, this will burn it and emit an event catched by the MFL backend to distribute the pack content.
