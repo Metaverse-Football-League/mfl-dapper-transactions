@@ -11,7 +11,7 @@ import MFLPlayer from 0x8ebcbfd516b1da27
   collection and a Player NFT collection if it does not already have them.
 **/
 
-transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64, buyerAddress: Address) {
+transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64, expectedBuyerAddress: Address) {
     let paymentVault: @FungibleToken.Vault
     let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
@@ -69,7 +69,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
     pre {
         self.salePrice == expectedPrice: "unexpected price"
         self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
-        self.buyerAddress == buyerAddress : "invalid buyer's address"
+        self.buyerAddress == expectedBuyerAddress : "invalid buyer's address"
     }
 
     execute {
