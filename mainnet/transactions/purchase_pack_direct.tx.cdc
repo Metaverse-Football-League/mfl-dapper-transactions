@@ -66,7 +66,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
 
     pre {
         self.salePrice == expectedPrice: "unexpected price"
-        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+        self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
     }
 
     execute {

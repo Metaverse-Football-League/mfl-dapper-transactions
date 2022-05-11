@@ -66,7 +66,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // Make sure dapp is actually the dapp and not some random account
     pre {
-        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+        self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
     }
 
     execute {
@@ -76,7 +76,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let amountRoyalty = saleItemPrice - amountSeller
 
         // Get the royalty recipient's public account object
-        let royaltyRecipient = getAccount(0x1ad1879bd179a148)
+        let royaltyRecipient = getAccount(0x15e71a9f7fe7d53d)
 
         // Get a reference to the royalty recipient's Receiver
         let royaltyReceiverRef = royaltyRecipient.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
