@@ -11,7 +11,7 @@ import MFLPlayer from 0x683564e46977788a
   collection and a Player NFT collection if it does not already have them.
 **/
 
-transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
+transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64, buyerAddress: Address) {
     let paymentVault: @FungibleToken.Vault
     let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
@@ -19,10 +19,12 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
     let balanceBeforeTransfer: UFix64
     let mainDUCVault: &DapperUtilityCoin.Vault
     let dappAddress: Address
+    let buyerAddress: Address
     let salePrice: UFix64
 
     prepare(dapp: AuthAccount, dapper: AuthAccount, buyer: AuthAccount) {
         self.dappAddress = dapp.address
+        self.buyerAddress = buyer.address
 
         // Initialize the MFLPlayer collection if the buyer does not already have one
         if buyer.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
@@ -67,6 +69,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
     pre {
         self.salePrice == expectedPrice: "unexpected price"
         self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+        self.buyerAddress == buyerAddress : "invalid buyer's address"
     }
 
     execute {
