@@ -4,7 +4,7 @@ import MFLPack from 0x8ebcbfd516b1da27
 import MFLPlayer from 0x8ebcbfd516b1da27
 
 /**
-  This tx opens a pack, this will burn it and emit an event catched by the MFL backend to distribute the pack content.
+  This tx opens a pack, this will burn it and emit an event handled by the MFL backend to distribute the pack content.
   This will also create a player Collection (if the account doesn't have one).
  **/
  
