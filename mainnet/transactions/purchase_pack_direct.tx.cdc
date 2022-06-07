@@ -7,7 +7,7 @@ import MFLPack from 0x8ebcbfd516b1da27
 import MFLPlayer from 0x8ebcbfd516b1da27
 
 /** 
-  This transaction purchases a pack on from a dapp. This transaction will also initialize the buyer's account with a Pack NFT
+  This transaction purchases a pack from a dapp. This transaction will also initialize the buyer's account with a Pack NFT
   collection and a Player NFT collection if it does not already have them.
 **/
 
