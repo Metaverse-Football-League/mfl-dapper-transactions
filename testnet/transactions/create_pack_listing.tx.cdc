@@ -5,7 +5,7 @@ import MFLPack from 0x683564e46977788a
 import NFTStorefront from 0x94b06cfca1d8a476
 
 /** 
-  This transaction can be used to place and Pack NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
+  This transaction can be used to place a Pack NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
   go to the dapp as a royalty.
 **/
 
