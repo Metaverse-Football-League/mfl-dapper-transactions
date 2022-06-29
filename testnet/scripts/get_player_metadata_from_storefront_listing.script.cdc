@@ -18,7 +18,7 @@ pub struct PurchaseData {
     }
 }
 
-pub fun main(address: Address, listingResourceID: UInt64): PurchaseData {
+pub fun main(merchantAccountAddress: Address, address: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
 
     let account = getAccount(address)
     let marketCollectionRef = account
