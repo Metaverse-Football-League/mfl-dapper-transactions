@@ -18,9 +18,9 @@ pub struct PurchaseData {
     }
 }
 
-pub fun main(merchantAccountAddress: Address, address: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
+pub fun main(merchantAccountAddress: Address, listingResourceID: UInt64, storefrontAddress: Address, expectedPrice: UFix64): PurchaseData {
 
-    let account = getAccount(address)
+    let account = getAccount(storefrontAddress)
     let marketCollectionRef = account
         .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
             NFTStorefront.StorefrontPublicPath
