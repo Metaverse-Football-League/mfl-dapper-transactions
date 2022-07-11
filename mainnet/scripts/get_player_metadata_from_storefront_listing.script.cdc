@@ -39,17 +39,19 @@ pub fun main(merchantAccountAddress: Address, listingResourceID: UInt64, storefr
     let nft = collection.borrowViewResolver(id: listingDetails.nftID )
 
     if let view = nft.resolveView(Type<MetadataViews.Display>()) {
-        
+
         let display = view as! MetadataViews.Display
+
+        let imageUrl = "https://d13e14gtps4iwl.cloudfront.net/players/"
 
         let purchaseData = PurchaseData(
             id: listingDetails.nftID,
             name: display.name,
             amount: listingDetails.salePrice,
             description: display.description,
-            imageURL: display.thumbnail.uri(),
+            imageURL: imageUrl.concat(listingDetails.nftID.toString()).concat("/card.png"),
         )
-        
+
         return purchaseData
     }
     panic("No NFT")
