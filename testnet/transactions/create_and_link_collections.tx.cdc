@@ -2,9 +2,10 @@ import NonFungibleToken from 0x631e88ae7f1d7c20
 import MetadataViews from 0x631e88ae7f1d7c20
 import MFLPack from 0x683564e46977788a
 import MFLPlayer from 0x683564e46977788a
+import MFLClub from 0x683564e46977788a
 
 /**
-  This tx creates a Pack and a Player NFT collections
+  This tx creates all the collections needed for MFL
   and exposes public capabilities to interact with them.
 **/
 
@@ -20,6 +21,11 @@ transaction() {
           let collection <- MFLPlayer.createEmptyCollection()
           acct.save(<-collection, to: MFLPlayer.CollectionStoragePath)
           acct.link<&MFLPlayer.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLPlayer.CollectionPublicPath, target: MFLPlayer.CollectionStoragePath)
+        }
+        if acct.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
+          let collection <- MFLClub.createEmptyCollection()
+          acct.save(<-collection, to: MFLClub.CollectionStoragePath)
+          acct.link<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLClub.CollectionPublicPath, target: MFLClub.CollectionStoragePath)
         }
     }
 
