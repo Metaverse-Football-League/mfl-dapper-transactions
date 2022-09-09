@@ -2,12 +2,13 @@ import NonFungibleToken from 0x1d7e57aa55817448
 import MetadataViews from 0x1d7e57aa55817448
 import MFLPack from 0x8ebcbfd516b1da27
 import MFLPlayer from 0x8ebcbfd516b1da27
+import MFLClub from 0x8ebcbfd516b1da27
 
 /**
   This tx opens a pack, this will burn it and emit an event handled by the MFL backend to distribute the pack content.
   This will also create a player Collection (if the account doesn't have one).
  **/
- 
+
  transaction(revealID: UInt64) {
     let collectionRef: &MFLPack.Collection
 
@@ -19,6 +20,13 @@ import MFLPlayer from 0x8ebcbfd516b1da27
             }
             owner.unlink(MFLPlayer.CollectionPublicPath)
             owner.link<&MFLPlayer.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLPlayer.CollectionPublicPath, target: MFLPlayer.CollectionStoragePath)
+        }
+        if !owner.getCapability<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLPlayer.CollectionPublicPath).check() {
+            if owner.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
+                owner.save(<- MFLClub.createEmptyCollection(), to: MFLClub.CollectionStoragePath)
+            }
+            owner.unlink(MFLClub.CollectionPublicPath)
+            owner.link<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLClub.CollectionPublicPath, target: MFLClub.CollectionStoragePath)
         }
     }
 
