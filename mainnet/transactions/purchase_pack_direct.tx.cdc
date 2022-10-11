@@ -6,7 +6,7 @@ import DapperUtilityCoin from 0xead892083b3e2c6c
 import MFLPack from 0x8ebcbfd516b1da27
 import MFLPlayer from 0x8ebcbfd516b1da27
 
-/**
+/** 
   This transaction purchases a pack from a dapp. This transaction will also initialize the buyer's account with a Pack NFT
   collection and a Player NFT collection if it does not already have them.
 **/
@@ -50,7 +50,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
             ?? panic("Could not borrow a reference to the storefront")
         self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
             ?? panic("No Listing with that ID in Storefront")
-
+        
         self.salePrice = self.listing.getDetails().salePrice
 
         self.mainDUCVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
@@ -80,5 +80,5 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
     post {
         self.mainDUCVault.balance == self.balanceBeforeTransfer: "DUC leakage"
     }
-
+    
 }
