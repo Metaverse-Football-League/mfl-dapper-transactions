@@ -38,6 +38,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let nftProviderPrivatePath = /private/MFLClubCollectionProviderForNFTStorefront
         let hasLinkedCollection = seller.getCapability<&MFLClub.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderPrivatePath)!.check()
         if !hasLinkedCollection {
+            seller.unlink(nftProviderPrivatePath)
             seller.link<&MFLClub.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath,
                 target: MFLClub.CollectionStoragePath
