@@ -4,7 +4,7 @@ import DapperUtilityCoin from 0x82ec283f88a62e65
 import MFLPlayer from 0x683564e46977788a
 import NFTStorefront from 0x94b06cfca1d8a476
 
-/** 
+/**
   This transaction can be used to place a Player NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
   go to the dapp as a royalty.
 **/
@@ -38,6 +38,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let nftProviderPrivatePath = /private/MFLPlayerCollectionProviderForNFTStorefront
         let hasLinkedCollection = seller.getCapability<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderPrivatePath)!.check()
         if !hasLinkedCollection {
+            seller.unlink(nftProviderPrivatePath)
             seller.link<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath,
                 target: MFLPlayer.CollectionStoragePath
