@@ -46,6 +46,15 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
         self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
         self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.salePrice)
 
+       // If the user does not have their collection linked to their account, link it.
+        let hasLinkedCollection = buyer.getCapability<&MFLClub.Collection{NonFungibleToken.CollectionPublic}>(MFLClub.CollectionPublicPath)!.check()
+        if !hasLinkedCollection {
+            buyer.unlink(MFLClub.CollectionPublicPath)
+            buyer.link<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+                MFLClub.CollectionPublicPath,
+                target: MFLClub.CollectionStoragePath
+            )
+        }
         // Get the collection from the buyer so the NFT can be deposited into it
         self.nftCollection = buyer
             .getCapability<&MFLClub.Collection{NonFungibleToken.CollectionPublic}>(MFLClub.CollectionPublicPath)
