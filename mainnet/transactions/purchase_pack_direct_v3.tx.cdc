@@ -12,7 +12,7 @@ import MFLClub from 0x8ebcbfd516b1da27
   collection and a Player NFT collection if it does not already have them.
 **/
 
-transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
+transaction(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
