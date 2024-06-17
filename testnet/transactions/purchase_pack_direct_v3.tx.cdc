@@ -13,75 +13,62 @@ import MFLClub from 0x683564e46977788a
 **/
 
 transaction(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
-    let paymentVault: @FungibleToken.Vault
-    let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
-    let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
-    let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
+    let paymentVault: @{FungibleToken.Vault}
+    let buyerNFTCollection: &MFLPack.Collection
+    let storefront: &{NFTStorefront.StorefrontPublic}
+    let listing: &{NFTStorefront.ListingPublic}
     let balanceBeforeTransfer: UFix64
     let mainDUCVault: &DapperUtilityCoin.Vault
     let dappAddress: Address
     let salePrice: UFix64
 
-    prepare(dapp: AuthAccount, dapper: AuthAccount, buyer: AuthAccount) {
+    prepare(dapp: &Account, dapper: &Account, buyer: &Account) {
         self.dappAddress = dapp.address
 
         // Initialize the MFLPlayer collection if the buyer does not already have one
-        if buyer.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
-            buyer.save(<- MFLPlayer.createEmptyCollection(), to: MFLPlayer.CollectionStoragePath)
-            buyer.link<&MFLPlayer.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
-                MFLPlayer.CollectionPublicPath,
-                target: MFLPlayer.CollectionStoragePath
-            )
-                ?? panic("Could not link MFLPlayer.Collection Pub Path")
+        if acct.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
+            let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
+            acct.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
+
+            acct.capabilities.unpublish(MFLPlayer.CollectionPublicPath)
+            let collectionCap = acct.capabilities.storage.issue<&MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
+            acct.capabilities.publish(collectionCap, at: MFLPlayer.CollectionPublicPath)
         }
 
         // Initialize the MFLPack collection if the buyer does not already have one
-        if buyer.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
-            buyer.save(<-MFLPack.createEmptyCollection(), to: MFLPack.CollectionStoragePath);
-            buyer.link<&MFLPack.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
-                MFLPack.CollectionPublicPath,
-                target: MFLPack.CollectionStoragePath
-            )
-                ?? panic("Could not link MFLPack.Collection Pub Path")
+        if acct.storage.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
+            let collection <- MFLPack.createEmptyCollection(nftType: Type<@MFLPack.NFT>())
+            acct.storage.save(<-collection, to: MFLPack.CollectionStoragePath)
+
+            acct.capabilities.unpublish(MFLPack.CollectionPublicPath)
+            let collectionCap = acct.capabilities.storage.issue<&MFLPack.Collection>(MFLPack.CollectionStoragePath)
+            acct.capabilities.publish(collectionCap, at: MFLPack.CollectionPublicPath)
         }
 
         // Initialize the MFLClub collection if the buyer does not already have one
-        if buyer.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
-            buyer.save(<- MFLClub.createEmptyCollection(), to: MFLClub.CollectionStoragePath)
-            buyer.link<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
-                MFLClub.CollectionPublicPath,
-                target: MFLClub.CollectionStoragePath
-            )
-                ?? panic("Could not link MFLClub.Collection Pub Path")
+        if acct.storage.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
+            let collection <- MFLClub.createEmptyCollection(nftType: Type<@MFLClub.NFT>())
+            acct.storage.save(<-collection, to: MFLClub.CollectionStoragePath)
+
+            acct.capabilities.unpublish(MFLClub.CollectionPublicPath)
+            let collectionCap = acct.capabilities.storage.issue<&MFLClub.Collection>(MFLClub.CollectionStoragePath)
+            acct.capabilities.publish(collectionCap, at: MFLClub.CollectionPublicPath)
         }
 
-        self.storefront = getAccount(storefrontAddress)
-            .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
-            .borrow()
-            ?? panic("Could not borrow a reference to the storefront")
+        self.storefront = getAccount(storefrontAddress).capabilities.borrow<&{NFTStorefront.StorefrontPublic}>(
+                NFTStorefront.StorefrontPublicPath
+            ) ?? panic("Could not borrow Storefront for the seller")
         self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
             ?? panic("No Listing with that ID in Storefront")
 
         self.salePrice = self.listing.getDetails().salePrice
 
-        self.mainDUCVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
-            ?? panic("Could not borrow reference to Dapper Utility Coin vault")
+        self.mainDUCVault = dapper.storage.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+            ?? panic("Cannot borrow DapperUtilityCoin vault from account storage")
         self.balanceBeforeTransfer = self.mainDUCVault.balance
         self.paymentVault <- self.mainDUCVault.withdraw(amount: self.salePrice)
 
-        // If the user does not have their collection linked to their account, link it.
-        let hasLinkedCollection = buyer.getCapability<&MFLPack.Collection{NonFungibleToken.CollectionPublic}>(MFLPack.CollectionPublicPath)!.check()
-        if !hasLinkedCollection {
-            buyer.unlink(MFLPack.CollectionPublicPath)
-            buyer.link<&MFLPack.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
-                MFLPack.CollectionPublicPath,
-                target: MFLPack.CollectionStoragePath
-            )
-        }
-
-        self.buyerNFTCollection = buyer
-            .getCapability<&MFLPack.Collection{NonFungibleToken.CollectionPublic}>(MFLPack.CollectionPublicPath)
-            .borrow()
+        self.buyerNFTCollection = buyer.capabilities.borrow<&MFLPack.Collection>(from: MFLPack.CollectionPublicPath)
             ?? panic("Cannot borrow NFT collection receiver from account")
     }
 

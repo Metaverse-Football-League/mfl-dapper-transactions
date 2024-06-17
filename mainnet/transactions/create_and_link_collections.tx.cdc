@@ -11,21 +11,32 @@ import MFLClub from 0x8ebcbfd516b1da27
 
 transaction() {
 
-    prepare(acct: AuthAccount) {
-        if acct.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
-          let collection <- MFLPack.createEmptyCollection()
-          acct.save(<-collection, to: MFLPack.CollectionStoragePath)
-          acct.link<&MFLPack.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLPack.CollectionPublicPath, target: MFLPack.CollectionStoragePath)
+    prepare(acct: auth(BorrowValue, SaveValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability) &Account) {
+        if acct.storage.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
+          let collection <- MFLPack.createEmptyCollection(nftType: Type<@MFLPack.NFT>())
+          acct.storage.save(<-collection, to: MFLPack.CollectionStoragePath)
+
+          acct.capabilities.unpublish(MFLPack.CollectionPublicPath)
+          let collectionCap = acct.capabilities.storage.issue<&MFLPack.Collection>(MFLPack.CollectionStoragePath)
+          acct.capabilities.publish(collectionCap, at: MFLPack.CollectionPublicPath)
         }
-        if acct.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
-          let collection <- MFLPlayer.createEmptyCollection()
-          acct.save(<-collection, to: MFLPlayer.CollectionStoragePath)
-          acct.link<&MFLPlayer.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLPlayer.CollectionPublicPath, target: MFLPlayer.CollectionStoragePath)
+
+        if acct.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
+          let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
+          acct.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
+
+          acct.capabilities.unpublish(MFLPlayer.CollectionPublicPath)
+          let collectionCap = acct.capabilities.storage.issue<&MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
+          acct.capabilities.publish(collectionCap, at: MFLPlayer.CollectionPublicPath)
         }
-        if acct.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
-          let collection <- MFLClub.createEmptyCollection()
-          acct.save(<-collection, to: MFLClub.CollectionStoragePath)
-          acct.link<&MFLClub.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(MFLClub.CollectionPublicPath, target: MFLClub.CollectionStoragePath)
+
+        if acct.storage.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
+          let collection <- MFLClub.createEmptyCollection(nftType: Type<@MFLClub.NFT>())
+          acct.storage.save(<-collection, to: MFLClub.CollectionStoragePath)
+
+          acct.capabilities.unpublish(MFLClub.CollectionPublicPath)
+          let collectionCap = acct.capabilities.storage.issue<&MFLClub.Collection>(MFLClub.CollectionStoragePath)
+          acct.capabilities.publish(collectionCap, at: MFLClub.CollectionPublicPath)
         }
     }
 

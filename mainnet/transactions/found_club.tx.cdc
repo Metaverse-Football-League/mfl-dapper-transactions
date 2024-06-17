@@ -6,12 +6,12 @@ import MFLClub from 0x8ebcbfd516b1da27
 **/
 
 transaction(clubID: UInt64, name: String, description: String) {
-    let clubCollectionRef: &MFLClub.Collection
+    let clubCollectionRef: auth(MFLClub.ClubAction) &MFLClub.Collection
     let dappAddress: Address
 
-    prepare(dapp: AuthAccount, userAcct: AuthAccount) {
+    prepare(dapp: &Account, userAcct: auth(BorrowValue) &Account) {
         self.dappAddress = dapp.address
-        self.clubCollectionRef = userAcct.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) ?? panic("Could not borrow club collection reference")
+        self.clubCollectionRef = userAcct.storage.borrow<auth(MFLClub.ClubAction) &MFLClub.Collection>from: MFLClub.CollectionStoragePath) ?? panic("Could not borrow club collection reference")
     }
 
     // Make sure dapp is actually the dapp and not some random account

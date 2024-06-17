@@ -8,10 +8,10 @@ import MFLPlayer from 0x683564e46977788a
 
 transaction(ids: [UInt64]) {
 
-    let acctPlayerCollection: &MFLPlayer.Collection
+    let acctPlayerCollection: auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection
 
-    prepare(acct: AuthAccount) {
-        self.acctPlayerCollection = acct.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) ?? panic("Could not borrow sender collection reference")
+    prepare(acct: auth(BorrowValue) &Account) {
+        self.acctPlayerCollection = acct.storage.borrow<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) ?? panic("Could not borrow collection reference")
     }
 
     execute {

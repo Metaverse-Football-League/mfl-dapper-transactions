@@ -11,47 +11,53 @@ import NFTStorefront from 0x94b06cfca1d8a476
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
-    let nftProvider: Capability<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
-    let storefront: &NFTStorefront.Storefront
+    let nftProvider: Capability<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>
+    let storefront: auth(NFTStorefront.CreateListing) &NFTStorefront.Storefront
     let dappAddress: Address
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
-    prepare(dapp: AuthAccount, seller: AuthAccount) {
+    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
         self.dappAddress = dapp.address
 
-        // If the account doesn't already have a storefront, create one and add it to the account
-        if seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
-            let newstorefront <- NFTStorefront.createStorefront()
-            seller.save(<-newstorefront, to: NFTStorefront.StorefrontStoragePath)
-            seller.link<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
-                NFTStorefront.StorefrontPublicPath,
-                target: NFTStorefront.StorefrontStoragePath
+        // If the account doesn't already have a Storefront
+        if seller.storage.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
+            // Save a new .Storefront to account storage
+            seller.storage.save(
+                <- NFTStorefront.createStorefront(),
+                to: NFTStorefront.StorefrontStoragePath
             )
+            // create a public capability for the .Storefront & publish
+            let storefrontPublicCap = seller.capabilities.storage.issue<&{NFTStorefront.StorefrontPublic}>(
+                NFTStorefront.StorefrontStoragePath
+            )
+            seller.capabilities.publish(storefrontPublicCap, at: NFTStorefront.StorefrontPublicPath)
         }
 
         // Get a reference to the receiver that will receive the fungible tokens if the sale executes.
-        self.sellerPaymentReceiver = seller.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
-        assert(self.sellerPaymentReceiver.borrow() != nil, message: "Missing or mis-typed DapperUtilityCoin receiver")
+        self.sellerPaymentReceiver = seller.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        assert(self.sellerPaymentReceiver.check(), message: "Missing or mis-typed DapperUtilityCoin receiver")
 
-        // If the user does not have their collection linked to their account, link it.
-        let nftProviderPrivatePath = /private/MFLPlayerCollectionProviderForNFTStorefront
-        let hasLinkedCollection = seller.getCapability<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderPrivatePath)!.check()
-        if !hasLinkedCollection {
-            seller.unlink(nftProviderPrivatePath)
-            seller.link<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
-                nftProviderPrivatePath,
-                target: MFLPlayer.CollectionStoragePath
-            )
+        // If the user does not have their collection set up
+        if seller.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
+          let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
+          seller.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
+
+          seller.capabilities.unpublish(MFLPlayer.CollectionPublicPath)
+          let collectionCap = seller.capabilities.storage.issue<&MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
+          seller.capabilities.publish(collectionCap, at: MFLPlayer.CollectionPublicPath)
         }
 
         // Get a capability to access the user's NFT collection.
-        self.nftProvider = seller.getCapability<&MFLPlayer.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderPrivatePath)!
-        assert(self.nftProvider.borrow() != nil, message: "Missing or mis-typed collection provider")
+        self.nftProvider = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(
+                MFLPack.CollectionStoragePath
+        )
+        assert(self.nftProvider.check(), message: "Missing or mis-typed collection provider")
 
         // Get a reference to the user's NFT storefront
-        self.storefront = seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath)
-            ?? panic("Missing or mis-typed NFTStorefront Storefront")
+        self.storefront = seller.storage.borrow<auth(NFTStorefront.CreateListing) &NFTStorefront.Storefront>(
+                from: NFTStorefront.StorefrontStoragePath
+            ) ?? panic("Missing or mis-typed NFTStorefront Storefront")
 
         // Make sure this NFT is not already listed for sale in this storefront.
         let existingOffers = self.storefront.getListingIDs()
@@ -67,7 +73,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // Make sure dapp is actually the dapp and not some random account
     pre {
-        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+        self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
     }
 
     execute {
@@ -77,10 +83,10 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let amountRoyalty = saleItemPrice - amountSeller
 
         // Get the royalty recipient's public account object
-        let royaltyRecipient = getAccount(0xbfff3f3685929cbd)
+        let royaltyRecipient = getAccount(0x15e71a9f7fe7d53d)
 
         // Get a reference to the royalty recipient's Receiver
-        let royaltyReceiverRef = royaltyRecipient.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        let royaltyReceiverRef = royaltyRecipient.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
         assert(royaltyReceiverRef.borrow() != nil, message: "Missing or mis-typed DapperUtilityCoin royalty receiver")
 
         let saleCutSeller = NFTStorefront.SaleCut(
