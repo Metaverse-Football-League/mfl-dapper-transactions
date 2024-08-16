@@ -22,37 +22,37 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
     let dappAddress: Address
     let salePrice: UFix64
 
-    prepare(dapp: &Account, dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue) &Account) {
+    prepare(dapp: &Account, dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
         self.dappAddress = dapp.address
 
         // Initialize the MFLPlayer collection if the buyer does not already have one
-        if acct.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
+        if buyer.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
             let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
-            acct.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
+            buyer.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
 
-            acct.capabilities.unpublish(MFLPlayer.CollectionPublicPath)
-            let collectionCap = acct.capabilities.storage.issue<&MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
-            acct.capabilities.publish(collectionCap, at: MFLPlayer.CollectionPublicPath)
+            buyer.capabilities.unpublish(MFLPlayer.CollectionPublicPath)
+            let collectionCap = buyer.capabilities.storage.issue<&MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
+            buyer.capabilities.publish(collectionCap, at: MFLPlayer.CollectionPublicPath)
         }
 
         // Initialize the MFLPack collection if the buyer does not already have one
-        if acct.storage.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
+        if buyer.storage.borrow<&MFLPack.Collection>(from: MFLPack.CollectionStoragePath) == nil {
             let collection <- MFLPack.createEmptyCollection(nftType: Type<@MFLPack.NFT>())
-            acct.storage.save(<-collection, to: MFLPack.CollectionStoragePath)
+            buyer.storage.save(<-collection, to: MFLPack.CollectionStoragePath)
 
-            acct.capabilities.unpublish(MFLPack.CollectionPublicPath)
-            let collectionCap = acct.capabilities.storage.issue<&MFLPack.Collection>(MFLPack.CollectionStoragePath)
-            acct.capabilities.publish(collectionCap, at: MFLPack.CollectionPublicPath)
+            buyer.capabilities.unpublish(MFLPack.CollectionPublicPath)
+            let collectionCap = buyer.capabilities.storage.issue<&MFLPack.Collection>(MFLPack.CollectionStoragePath)
+            buyer.capabilities.publish(collectionCap, at: MFLPack.CollectionPublicPath)
         }
 
         // Initialize the MFLClub collection if the buyer does not already have one
-        if acct.storage.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
+        if buyer.storage.borrow<&MFLClub.Collection>(from: MFLClub.CollectionStoragePath) == nil {
             let collection <- MFLClub.createEmptyCollection(nftType: Type<@MFLClub.NFT>())
-            acct.storage.save(<-collection, to: MFLClub.CollectionStoragePath)
+            buyer.storage.save(<-collection, to: MFLClub.CollectionStoragePath)
 
-            acct.capabilities.unpublish(MFLClub.CollectionPublicPath)
-            let collectionCap = acct.capabilities.storage.issue<&MFLClub.Collection>(MFLClub.CollectionStoragePath)
-            acct.capabilities.publish(collectionCap, at: MFLClub.CollectionPublicPath)
+            buyer.capabilities.unpublish(MFLClub.CollectionPublicPath)
+            let collectionCap = buyer.capabilities.storage.issue<&MFLClub.Collection>(MFLClub.CollectionStoragePath)
+            buyer.capabilities.publish(collectionCap, at: MFLClub.CollectionPublicPath)
         }
 
         self.storefront = getAccount(storefrontAddress).capabilities.borrow<&{NFTStorefront.StorefrontPublic}>(
