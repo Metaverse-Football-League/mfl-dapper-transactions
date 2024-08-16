@@ -12,12 +12,12 @@ import NFTStorefront from 0x4eb8a10cb9f87357
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
     let nftProvider: Capability<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>
-    let storefront: auth(NFTStorefront.CreateListing) &NFTStorefront.Storefront
+    let storefront: auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront
     let dappAddress: Address
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
-    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, SaveValue) &Account) {
+    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
         self.dappAddress = dapp.address
 
         // If the account doesn't already have a Storefront
@@ -50,12 +50,12 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
         // Get a capability to access the user's NFT collection.
         self.nftProvider = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(
-                MFLPack.CollectionStoragePath
+                MFLPlayer.CollectionStoragePath
         )
         assert(self.nftProvider.check(), message: "Missing or mis-typed collection provider")
 
         // Get a reference to the user's NFT storefront
-        self.storefront = seller.storage.borrow<auth(NFTStorefront.CreateListing) &NFTStorefront.Storefront>(
+        self.storefront = seller.storage.borrow<auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront>(
                 from: NFTStorefront.StorefrontStoragePath
             ) ?? panic("Missing or mis-typed NFTStorefront Storefront")
 
@@ -63,7 +63,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let existingOffers = self.storefront.getListingIDs()
         if existingOffers.length > 0 {
             for listingResourceID in existingOffers {
-                let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}? = self.storefront.borrowListing(listingResourceID: listingResourceID)
+                let listing: &{NFTStorefront.ListingPublic}? = self.storefront.borrowListing(listingResourceID: listingResourceID)
                 if listing != nil && listing!.getDetails().nftID == saleItemID && listing!.getDetails().nftType == Type<@MFLPlayer.NFT>(){
                     self.storefront.removeListing(listingResourceID: listingResourceID)
                 }

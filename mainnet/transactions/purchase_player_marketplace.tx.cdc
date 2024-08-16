@@ -13,9 +13,9 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
     let listing: &{NFTStorefront.ListingPublic}
     let salePrice: UFix64
     let balanceBeforeTransfer: UFix64
-    let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
+    let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 
-    prepare(dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue) &Account) {
+    prepare(dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
         // Initialize the MFLPlayer collection if the buyer does not already have one
         if buyer.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
             let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
@@ -37,7 +37,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
         self.salePrice = self.listing.getDetails().salePrice
 
         // Get a DUC vault from Dapper's account
-        self.mainDapperUtilityCoinVault = dapper.storage.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+        self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
             ?? panic("Cannot borrow DapperUtilityCoin vault from account storage")
         self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
         self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.salePrice)
