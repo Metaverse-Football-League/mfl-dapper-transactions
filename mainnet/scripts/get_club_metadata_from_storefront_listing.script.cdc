@@ -47,7 +47,7 @@ fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingRes
     let collection = account.capabilities.borrow<&MFLClub.Collection>(MFLClub.CollectionPublicPath)
         ?? panic("Could not borrow a reference to the collection")
 
-    let nft = collection.borrowViewResolver(id: listingDetails.nftID )
+    let nft = collection.borrowViewResolver(id: listingDetails.nftID ) ?? panic("Could not borrow the view resolved")
 
     if let view = nft.resolveView(Type<MetadataViews.Display>()) {
 
