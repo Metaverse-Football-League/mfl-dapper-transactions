@@ -43,7 +43,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
         self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.salePrice)
 
         // Get the collection from the buyer so the NFT can be deposited into it
-        self.nftCollection = buyer.capabilities.borrow<&MFLClub.Collection>(from: MFLClub.CollectionPublicPath)
+        self.nftCollection = buyer.capabilities.borrow<&MFLClub.Collection>(MFLClub.CollectionPublicPath)
             ?? panic("Cannot borrow NFT collection receiver from account")
     }
 

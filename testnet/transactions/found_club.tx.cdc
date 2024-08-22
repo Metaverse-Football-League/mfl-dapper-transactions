@@ -11,7 +11,7 @@ transaction(clubID: UInt64, name: String, description: String) {
 
     prepare(dapp: &Account, userAcct: auth(BorrowValue) &Account) {
         self.dappAddress = dapp.address
-        self.clubCollectionRef = userAcct.storage.borrow<auth(MFLClub.ClubAction) &MFLClub.Collection>from: MFLClub.CollectionStoragePath) ?? panic("Could not borrow club collection reference")
+        self.clubCollectionRef = userAcct.storage.borrow<auth(MFLClub.ClubAction) &MFLClub.Collection>(from: MFLClub.CollectionStoragePath) ?? panic("Could not borrow club collection reference")
     }
 
     // Make sure dapp is actually the dapp and not some random account

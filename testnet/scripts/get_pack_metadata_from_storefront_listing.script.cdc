@@ -29,9 +29,9 @@ struct PurchaseData {
 }
 
 access(all)
-fun main(address: Address, listingResourceID: UInt64): PurchaseData {
+fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
 
-    let account = getAccount(address)
+    let account = getAccount(storefrontAddress)
     let marketCollectionRef = account.capabilities.borrow<&{NFTStorefront.StorefrontPublic}>(
            NFTStorefront.StorefrontPublicPath
        ) ?? panic("Could not borrow Storefront")

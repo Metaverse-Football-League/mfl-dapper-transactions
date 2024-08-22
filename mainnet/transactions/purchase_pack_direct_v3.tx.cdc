@@ -68,7 +68,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
         self.balanceBeforeTransfer = self.mainDUCVault.balance
         self.paymentVault <- self.mainDUCVault.withdraw(amount: self.salePrice)
 
-        self.buyerNFTCollection = buyer.capabilities.borrow<&MFLPack.Collection>(from: MFLPack.CollectionPublicPath)
+        self.buyerNFTCollection = buyer.capabilities.borrow<&MFLPack.Collection>(MFLPack.CollectionPublicPath)
             ?? panic("Cannot borrow NFT collection receiver from account")
     }
 
