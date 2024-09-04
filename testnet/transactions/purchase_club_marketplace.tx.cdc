@@ -37,7 +37,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
         self.salePrice = self.listing.getDetails().salePrice
 
         // Get a DUC vault from Dapper's account
-        self.mainDapperUtilityCoinVault = dapper.storage.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+        self.mainDapperUtilityCoinVault = dapper.storage.borrow<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
             ?? panic("Cannot borrow DapperUtilityCoin vault from account storage")
         self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
         self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.salePrice)
