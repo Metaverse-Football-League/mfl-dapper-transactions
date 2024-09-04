@@ -7,8 +7,8 @@ import NFTStorefront from 0x94b06cfca1d8a476
 // This transaction purchases a Player on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This transaction
 // will also initialize the buyer's Player collection on their account if it has not already been initialized.
 transaction(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
+    let nftCollection: &MFLPlayer.Collectionx
     let paymentVault: @{FungibleToken.Vault}
-    let nftCollection: &MFLPlayer.Collection
     let storefront: &{NFTStorefront.StorefrontPublic}
     let listing: &{NFTStorefront.ListingPublic}
     let salePrice: UFix64
@@ -51,6 +51,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
     pre {
         self.salePrice == expectedPrice: "unexpected price"
     }
+
 
     execute {
         let item <- self.listing.purchase(

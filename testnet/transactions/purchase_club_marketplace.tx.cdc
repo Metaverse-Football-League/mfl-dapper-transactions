@@ -13,7 +13,7 @@ transaction(storefrontAddress: Address, merchantAccountAddress: Address, listing
     let listing: &{NFTStorefront.ListingPublic}
     let salePrice: UFix64
     let balanceBeforeTransfer: UFix64
-    let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
+    let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 
     prepare(dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
         // Initialize the MFLClub collection if the buyer does not already have one
