@@ -2,12 +2,23 @@ import MetadataViews from 0x1d7e57aa55817448
 import NFTStorefront from 0x4eb8a10cb9f87357
 import MFLPlayer from 0x8ebcbfd516b1da27
 
-pub struct PurchaseData {
-    pub let id: UInt64
-    pub let name: String
-    pub let amount: UFix64
-    pub let description: String?
-    pub let imageURL: String?
+access(all)
+struct PurchaseData {
+
+    access(all)
+    let id: UInt64
+
+    access(all)
+    let name: String
+
+    access(all)
+    let amount: UFix64
+
+    access(all)
+    let description: String?
+
+    access(all)
+    let imageURL: String?
 
     init(id: UInt64, name: String, amount: UFix64, description: String?, imageURL: String?) {
         self.id = id
@@ -18,25 +29,24 @@ pub struct PurchaseData {
     }
 }
 
-pub fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
+
+access(all)
+fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
 
     let account = getAccount(storefrontAddress)
-    let marketCollectionRef = account
-        .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
-            NFTStorefront.StorefrontPublicPath
-        )
-        .borrow()
-        ?? panic("Could not borrow market collection from address")
+    let marketCollectionRef = account.capabilities.borrow<&{NFTStorefront.StorefrontPublic}>(
+          NFTStorefront.StorefrontPublicPath
+      ) ?? panic("Could not borrow Storefront")
 
     let saleItem = marketCollectionRef.borrowListing(listingResourceID: listingResourceID)
         ?? panic("No item with that ID")
 
     let listingDetails = saleItem.getDetails()!
 
-    let collection = account.getCapability(MFLPlayer.CollectionPublicPath).borrow<&{MetadataViews.ResolverCollection}>()
+    let collection = account.capabilities.borrow<&MFLPlayer.Collection>(MFLPlayer.CollectionPublicPath)
         ?? panic("Could not borrow a reference to the collection")
 
-    let nft = collection.borrowViewResolver(id: listingDetails.nftID )
+    let nft = collection.borrowViewResolver(id: listingDetails.nftID ) ?? panic("Could not borrow the view resolved")
 
     if let view = nft.resolveView(Type<MetadataViews.Display>()) {
 

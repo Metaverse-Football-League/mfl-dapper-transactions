@@ -1,6 +1,7 @@
-import MetadataViews from 0x631e88ae7f1d7c20
-import NFTStorefront from 0x94b06cfca1d8a476
-import MFLPlayer from 0x683564e46977788a
+import MetadataViews from 0x1d7e57aa55817448
+import NFTStorefront from 0x4eb8a10cb9f87357
+import MFLClub from 0x8ebcbfd516b1da27
+
 
 access(all)
 struct PurchaseData {
@@ -33,17 +34,17 @@ struct PurchaseData {
 access(all)
 fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
 
-    let account = getAccount(storefrontAddress)
+  let account = getAccount(storefrontAddress)
     let marketCollectionRef = account.capabilities.borrow<&{NFTStorefront.StorefrontPublic}>(
-          NFTStorefront.StorefrontPublicPath
-      ) ?? panic("Could not borrow Storefront")
+           NFTStorefront.StorefrontPublicPath
+       ) ?? panic("Could not borrow Storefront")
 
     let saleItem = marketCollectionRef.borrowListing(listingResourceID: listingResourceID)
         ?? panic("No item with that ID")
 
     let listingDetails = saleItem.getDetails()!
 
-    let collection = account.capabilities.borrow<&MFLPlayer.Collection>(MFLPlayer.CollectionPublicPath)
+    let collection = account.capabilities.borrow<&MFLClub.Collection>(MFLClub.CollectionPublicPath)
         ?? panic("Could not borrow a reference to the collection")
 
     let nft = collection.borrowViewResolver(id: listingDetails.nftID ) ?? panic("Could not borrow the view resolved")
@@ -51,15 +52,12 @@ fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingRes
     if let view = nft.resolveView(Type<MetadataViews.Display>()) {
 
         let display = view as! MetadataViews.Display
-
-        let imageUrl = "https://d25q37b6uc8p6e.cloudfront.net/players/"
-
         let purchaseData = PurchaseData(
             id: listingDetails.nftID,
             name: display.name,
             amount: listingDetails.salePrice,
             description: display.description,
-            imageURL: imageUrl.concat(listingDetails.nftID.toString()).concat("/card.png"),
+            imageURL: display.thumbnail.uri(),
         )
 
         return purchaseData
