@@ -11,7 +11,7 @@ import NFTStorefront from 0x94b06cfca1d8a476
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
-    let nftProvider: Capability<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>
+    let nftProviderCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
     let storefront: auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront
     let dappAddress: Address
 
@@ -49,10 +49,17 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         }
 
         // Get a capability to access the user's NFT collection.
-        self.nftProvider = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(
-                MFLPlayer.CollectionStoragePath
-        )
-        assert(self.nftProvider.check(), message: "Missing or mis-typed collection provider")
+        let nftProviderCapStoragePath: StoragePath = /storage/MFLPlayerCollectionCap
+        let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>>(from: MFLPlayer.CollectionStoragePath)
+        if cap != nil && cap!.check() {
+            self.nftProviderCap = cap!
+        } else {
+            // clean this storage slot in case something is there already
+            seller.storage.load<AnyStruct>(from: MFLPlayer.CollectionStoragePath)
+            self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderCapStoragePath)
+            seller.storage.save(self.nftProviderCap, to: MFLPlayer.CollectionStoragePath)
+        }
+        assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")
 
         // Get a reference to the user's NFT storefront
         self.storefront = seller.storage.borrow<auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront>(
@@ -100,7 +107,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         )
 
         self.storefront.createListing(
-            nftProviderCapability: self.nftProvider,
+            nftProviderCapability: self.nftProviderCap,
             nftType: Type<@MFLPlayer.NFT>(),
             nftID: saleItemID,
             salePaymentVaultType: Type<@DapperUtilityCoin.Vault>(),
