@@ -17,7 +17,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
-    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
+    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, LoadValue, SaveValue, CopyValue) &Account) {
         self.dappAddress = dapp.address
 
         // If the account doesn't already have a Storefront
