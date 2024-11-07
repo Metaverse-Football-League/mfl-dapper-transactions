@@ -50,14 +50,14 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
         // Get a capability to access the user's NFT collection.
         let nftProviderCapStoragePath: StoragePath = /storage/MFLPlayerCollectionCap
-        let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>>(from: MFLPlayer.CollectionStoragePath)
+        let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>>(from: nftProviderCapStoragePath)
         if cap != nil && cap!.check() {
             self.nftProviderCap = cap!
         } else {
             // clean this storage slot in case something is there already
-            seller.storage.load<AnyStruct>(from: MFLPlayer.CollectionStoragePath)
+            seller.storage.load<AnyStruct>(from: nftProviderCapStoragePath)
             self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(nftProviderCapStoragePath)
-            seller.storage.save(self.nftProviderCap, to: MFLPlayer.CollectionStoragePath)
+            seller.storage.save(self.nftProviderCap, to: nftProviderCapStoragePath)
         }
         assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")
 
