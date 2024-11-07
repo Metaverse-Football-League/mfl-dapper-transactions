@@ -11,7 +11,7 @@ import NFTStorefront from 0x94b06cfca1d8a476
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
-    let nftProviderCap: Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
+    let nftProviderCap: Capability<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>
     let storefront: auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront
     let dappAddress: Address
 
@@ -50,13 +50,13 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
         // Get a capability to access the user's NFT collection.
        let nftProviderCapStoragePath: StoragePath = /storage/MFLClubCollectionCap
-       let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>>(from: MFLClub.CollectionStoragePath)
+       let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>>(from: MFLClub.CollectionStoragePath)
        if cap != nil && cap!.check() {
            self.nftProviderCap = cap!
        } else {
            // clean this storage slot in case something is there already
            seller.storage.load<AnyStruct>(from: MFLClub.CollectionStoragePath)
-           self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(nftProviderCapStoragePath)
+           self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>(nftProviderCapStoragePath)
            seller.storage.save(self.nftProviderCap, to: MFLClub.CollectionStoragePath)
        }
         assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")

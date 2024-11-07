@@ -11,13 +11,13 @@ import NFTStorefront from 0x4eb8a10cb9f87357
 
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
-    let nftProvider: Capability<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>
+    let nftProviderCap: Capability<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>
     let storefront: auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront
     let dappAddress: Address
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
-    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
+    prepare(dapp: &Account, seller: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, LoadValue, SaveValue, CopyValue) &Account) {
         self.dappAddress = dapp.address
 
         // If the account doesn't already have a Storefront
@@ -49,10 +49,17 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         }
 
         // Get a capability to access the user's NFT collection.
-        self.nftProvider = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>(
-                MFLClub.CollectionStoragePath
-        )
-        assert(self.nftProvider.check(), message: "Missing or mis-typed collection provider")
+       let nftProviderCapStoragePath: StoragePath = /storage/MFLClubCollectionCap
+       let cap = seller.storage.copy<Capability<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>>(from: MFLClub.CollectionStoragePath)
+       if cap != nil && cap!.check() {
+           self.nftProviderCap = cap!
+       } else {
+           // clean this storage slot in case something is there already
+           seller.storage.load<AnyStruct>(from: MFLClub.CollectionStoragePath)
+           self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLClub.Collection>(nftProviderCapStoragePath)
+           seller.storage.save(self.nftProviderCap, to: MFLClub.CollectionStoragePath)
+       }
+        assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")
 
         // Get a reference to the user's NFT storefront
         self.storefront = seller.storage.borrow<auth(NFTStorefront.CreateListing, NFTStorefront.RemoveListing) &NFTStorefront.Storefront>(
@@ -73,7 +80,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // Make sure dapp is actually the dapp and not some random account
     pre {
-        self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
+        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
     }
 
     execute {
@@ -83,7 +90,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let amountRoyalty = saleItemPrice - amountSeller
 
         // Get the royalty recipient's public account object
-        let royaltyRecipient = getAccount(0x15e71a9f7fe7d53d)
+        let royaltyRecipient = getAccount(0xbfff3f3685929cbd)
 
         // Get a reference to the royalty recipient's Receiver
         let royaltyReceiverRef = royaltyRecipient.capabilities.get<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
@@ -100,7 +107,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         )
 
         self.storefront.createListing(
-            nftProviderCapability: self.nftProvider,
+            nftProviderCapability: self.nftProviderCap,
             nftType: Type<@MFLClub.NFT>(),
             nftID: saleItemID,
             salePaymentVaultType: Type<@DapperUtilityCoin.Vault>(),
