@@ -56,7 +56,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         } else {
             // clean this storage slot in case something is there already
             seller.storage.load<AnyStruct>(from: nftProviderCapStoragePath)
-            self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(nftProviderCapStoragePath)
+            self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPlayer.Collection>(MFLPlayer.CollectionStoragePath)
             seller.storage.save(self.nftProviderCap, to: nftProviderCapStoragePath)
         }
         assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")
