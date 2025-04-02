@@ -7,14 +7,8 @@ struct OfferV2Metadata {
 	access(all) let royalties: {Address: UFix64}
 	access(all) let params: {String: String}
 
-	init(amount: UFix64, royalties: {Address: UFix64}, paramsString: {String: String}) {
-        pre {
-            paramsString.containsKey("nftId"): "paramsString must contain key 'serialNumber'"
-        }
-
- 		let nftId = UInt64.fromString(paramsString["nftId"]!)
-                ?? panic("could not parse nftId as UInt64")
-		let playerData = MFLPlayer.getPlayerData(id: nftId)
+	init(amount: UFix64, royalties: {Address: UFix64}, playerId: UInt64) {
+		let playerData = MFLPlayer.getPlayerData(id: playerId)
                 ?? panic("could not get player data")
 		let view = MFLPlayer.resolveViewFromData(Type<MetadataViews.Display>(), playerData: playerData)
 		 	?? panic("could not get display view")
@@ -32,6 +26,6 @@ struct OfferV2Metadata {
 }
 
 access(all)
-fun main(amount: UFix64, royalties: {Address: UFix64}, paramsString: {String: String}): OfferV2Metadata {
-	return OfferV2Metadata(amount: amount, royalties: royalties, paramsString: paramsString)
+fun main(amount: UFix64, royalties: {Address: UFix64}, playerId: UInt64, expiry: UInt64): OfferV2Metadata {
+	return OfferV2Metadata(amount: amount, royalties: royalties, playerId: playerId)
 }

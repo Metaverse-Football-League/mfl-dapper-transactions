@@ -4,8 +4,8 @@ import OffersV2 from 0x8a5f647e58dde1ee
 import DapperOffersV2 from 0x8a5f647e58dde1ee
 import DapperUtilityCoin from 0x82ec283f88a62e65
 import Resolver from 0x8a5f647e58dde1ee
-import MFLOffersResolver from 0x683564e46977788a
 import MFLPlayer from 0x683564e46977788a
+import MFLOffersResolver from 0x683564e46977788a
 
 transaction(
     amount: UFix64,
