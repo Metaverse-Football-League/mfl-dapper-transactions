@@ -3,12 +3,8 @@ import FungibleToken from 0x9a0766d93b6608b7
 import OffersV2 from 0x8a5f647e58dde1ee
 import DapperOffersV2 from 0x8a5f647e58dde1ee
 import MetadataViews from 0x631e88ae7f1d7c20
-import DapperUtilityCoin from 0x82ec283f88a62e65
 import MFLPlayer from 0x683564e46977788a
-
-/**
-  This tx accepts an offer for a MFL Player
-**/
+import DapperUtilityCoin from 0x82ec283f88a62e65
 
 transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
     let dapperOffer: &DapperOffersV2.DapperOffer

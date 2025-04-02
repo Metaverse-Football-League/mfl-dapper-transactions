@@ -7,10 +7,6 @@ import Resolver from 0x8a5f647e58dde1ee
 import MFLOffersResolver from 0x683564e46977788a
 import MFLPlayer from 0x683564e46977788a
 
-/**
-  This tx creates an offer for a MFL Player
-**/
-
 transaction(
     amount: UFix64,
     royalties: {Address: UFix64},
@@ -100,7 +96,6 @@ transaction(
         } else {
             self.ducVaultRef = dapper.capabilities.storage.issue<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(/storage/dapperUtilityCoinVault)
             dapper.storage.save(self.ducVaultRef, to: ducCapStoragePath)
-            let initalDucSupplyee = self.ducVaultRef.borrow()!.balance
         }
 
         assert(self.ducVaultRef.check() != nil, message: "Missing or mis-typed DapperUtilityCoin provider")
