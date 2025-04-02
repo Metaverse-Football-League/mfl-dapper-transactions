@@ -14,14 +14,15 @@ struct OfferV2Metadata {
 		 	?? panic("could not get display view")
 		let displayView = view as! MetadataViews.Display
 
- 		paramsString["assetName"] =  displayView.name
-		paramsString["assetImageUrl"] = displayView.thumbnail.uri()
-		paramsString["assetDescription"] = displayView.description
-		paramsString["typeId"] = "Type<@MFLPlayer.NFT>()"
+		let params: {String: String} = {}
+ 		params["assetName"] =  displayView.name
+		params["assetImageUrl"] = displayView.thumbnail.uri()
+		params["assetDescription"] = displayView.description
+		params["typeId"] = "Type<@MFLPlayer.NFT>()"
 
 		self.amount = amount
 		self.royalties = royalties
-		self.params = paramsString
+		self.params = params
 	}
 }
 
