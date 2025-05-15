@@ -18,7 +18,9 @@ struct OfferV2Metadata {
  		params["assetName"] =  displayView.name
 		params["assetImageUrl"] = displayView.thumbnail.uri()
 		params["assetDescription"] = displayView.description
-		params["typeId"] = "Type<@MFLPlayer.NFT>()"
+		params["typeId"] = "A.683564e46977788a.MFLPlayer.NFT"
+		params["_type"] = "NFT"
+		params["nftId"] =  playerId.toString()
 
 		self.amount = amount
 		self.royalties = royalties
