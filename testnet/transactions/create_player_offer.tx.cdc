@@ -18,8 +18,11 @@ transaction(
 	let ducVaultRef: Capability<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>
 	let resolverCapability: Capability<&{Resolver.ResolverPublic}>
 	let tokenAdminCollection: Capability<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>
+	let dappAddress: Address
 
-    prepare(signer: auth(Storage, Capabilities) &Account, dapper: auth(Storage, Capabilities) &Account) {
+    prepare(dapp: &Account, signer: auth(Storage, Capabilities) &Account, dapper: auth(Storage, Capabilities) &Account) {
+    	self.dappAddress = dapp.address
+
 		if signer.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
 			let collection <- MFLPlayer.createEmptyCollection(nftType: Type<@MFLPlayer.NFT>())
 			signer.storage.save(<-collection, to: MFLPlayer.CollectionStoragePath)
@@ -103,6 +106,10 @@ transaction(
         self.resolverCapability = MFLOffersResolver.getResolverCap()
     }
 
+    pre {
+        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+    }
+
     execute {
         var royaltysList: [OffersV2.Royalty] = []
         for k in royalties.keys {
@@ -119,6 +126,7 @@ transaction(
         offerParamsString.insert(key: "resolver", "0")
         offerParamsString.insert(key: "_type", "NFT")
         offerParamsString.insert(key: "typeId", typeId)
+        offerParamsString.insert(key: "marketplace", "MFL")
 
         let offerParamsUInt64: {String: UInt64} = { "expiry": expiry }
 

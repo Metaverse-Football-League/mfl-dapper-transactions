@@ -10,8 +10,11 @@ transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
     let dapperOffer: &DapperOffersV2.DapperOffer
     let offer: &{OffersV2.OfferPublic}
     let receiverCapability: Capability<&{FungibleToken.Receiver}>
+	let dappAddress: Address
 
-    prepare(signer: auth(Storage) &Account) {
+    prepare(dapp: &Account, signer: auth(Storage) &Account) {
+    	self.dappAddress = dapp.address
+    	
         // Get the DapperOffers resource
         self.dapperOffer = getAccount(dapperOfferAddress).capabilities.get<&DapperOffersV2.DapperOffer>(DapperOffersV2.DapperOffersPublicPath).borrow()
             ?? panic("Could not borrow DapperOffer from provided address")
@@ -34,6 +37,10 @@ transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
             item: <-nft,
             receiverCapability: self.receiverCapability
         )
+    }
+
+    pre {
+        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
     }
 
     execute {
