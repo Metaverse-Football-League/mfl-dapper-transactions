@@ -20,7 +20,7 @@ transaction(
 	let tokenAdminCollection: Capability<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>
 	let dappAddress: Address
 
-    prepare(dapp: &Account, signer: auth(Storage, Capabilities) &Account, dapper: auth(Storage, Capabilities) &Account) {
+    prepare(dapp: auth(Storage, Capabilities) &Account, signer: auth(Storage, Capabilities) &Account, dapper: auth(Storage, Capabilities) &Account) {
     	self.dappAddress = dapp.address
 
 		if signer.storage.borrow<&MFLPlayer.Collection>(from: MFLPlayer.CollectionStoragePath) == nil {
@@ -83,6 +83,11 @@ transaction(
         let capabilityReceiver = dapper.capabilities.get<&{DapperOffersV2.DapperOfferPublic}>(/public/DapperOffersV2).borrow()
             ?? panic("Could not borrow capability receiver reference")
         capabilityReceiver.addProxyCapability(account: signer.address, cap: self.tokenAdminCollection)
+
+        // Setup Proxy Cancel for MFL
+        let mflCapabilityReceiver = dapp.capabilities.get<&{DapperOffersV2.DapperOfferPublic}>(/public/DapperOffersV2).borrow()
+            ?? panic("Could not borrow MFL capability receiver reference")
+        mflCapabilityReceiver.addProxyCapability(account: signer.address, cap: self.tokenAdminCollection)
 
         // Get the capability to the offer creators NFT collection
         self.nftReceiver = signer.capabilities.get<&MFLPlayer.Collection>(MFLPlayer.CollectionPublicPath)
