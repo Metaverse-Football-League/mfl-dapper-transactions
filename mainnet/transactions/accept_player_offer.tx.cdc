@@ -1,10 +1,12 @@
-import NonFungibleToken from 0x631e88ae7f1d7c20
-import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x1d7e57aa55817448
+import FungibleToken from 0xf233dcee88fe0abe
+import OffersV2 from 0xb8ea91944fd51c43
+import DapperOffersV2 from 0xb8ea91944fd51c43
+import MetadataViews from 0x1d7e57aa55817448
 import OffersV2 from 0x8a5f647e58dde1ee
 import DapperOffersV2 from 0x8a5f647e58dde1ee
-import MetadataViews from 0x631e88ae7f1d7c20
-import MFLPlayer from 0x683564e46977788a
-import DapperUtilityCoin from 0x82ec283f88a62e65
+import MFLPlayer from 0x8ebcbfd516b1da27
+import DapperUtilityCoin from 0xead892083b3e2c6c
 
 transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
     let dapperOffer: &DapperOffersV2.DapperOffer
@@ -39,7 +41,7 @@ transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
     }
 
     pre {
-        self.dappAddress == 0xbfff3f3685929cbd : "Requires valid authorizing signature"
+        self.dappAddress == 0x15e71a9f7fe7d53d : "Requires valid authorizing signature"
     }
 
     execute {
