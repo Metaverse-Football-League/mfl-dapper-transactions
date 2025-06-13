@@ -131,7 +131,7 @@ transaction(
             ))
         }
 
-        let typeId = "A.8ebcbfd516b1da27.MFLPlayer.NFT"
+        let typeId = "A.683564e46977788a.MFLPlayer.NFT"
 
 		let offerParamsString: {String: String} = {}
         offerParamsString.insert(key: "nftId", playerId.toString())
