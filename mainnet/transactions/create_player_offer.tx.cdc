@@ -5,7 +5,7 @@ import DapperOffersV2 from 0xb8ea91944fd51c43
 import DapperUtilityCoin from 0xead892083b3e2c6c
 import MFLPlayer from 0x8ebcbfd516b1da27
 import MFLOffersResolver from 0x8ebcbfd516b1da27
-import Resolver from 0b8ea91944fd51c43
+import Resolver from 0xb8ea91944fd51c43
 
 transaction(
     amount: UFix64,
