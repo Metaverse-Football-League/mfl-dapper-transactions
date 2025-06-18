@@ -55,25 +55,29 @@ transaction(
             }
         }
 
-        var proxyManagerCap: Capability<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>? = nil
-        // check if there is an existing capability/capability controller for the storage path
-        let proxyManagerControllers = signer.capabilities.storage.getControllers(forPath: DapperOffersV2.DapperOffersStoragePath)
-        for controller in proxyManagerControllers {
-            if let maybeProviderCap = controller.capability as? Capability<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>? {
-                proxyManagerCap = maybeProviderCap
-                break
-            }
+        // DapperOfferProxyManager Setup
+		let proxyStoragePath = /storage/mflDapperOfferProxy
+		let copiedProxy = signer.storage.copy<Capability<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>>(from: proxyStoragePath)
+		if copiedProxy?.check() == true {
+		   self.tokenAdminCollection = copiedProxy!
+		} else {
+		   self.tokenAdminCollection = signer.capabilities.storage.issue<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>(DapperOffersV2.DapperOffersStoragePath)
+		   signer.storage.load<AnyStruct>(from: proxyStoragePath)
+		   signer.storage.save(self.tokenAdminCollection, to: proxyStoragePath)
+		}
+
+		if dapper.storage.borrow<&DapperOffersV2.DapperOffer>(from: DapperOffersV2.DapperOffersStoragePath) == nil {Add commentMore actions
+            let dapperOffer <- DapperOffersV2.createDapperOffer()
+            dapper.storage.save(<-dapperOffer, to: DapperOffersV2.DapperOffersStoragePath)
+            dapper.capabilities.publish(
+                dapper.capabilities.storage.issue<&{DapperOffersV2.DapperOfferPublic}>(DapperOffersV2.DapperOffersStoragePath),
+                at: DapperOffersV2.DapperOffersPublicPath
+            )
+
+            let proxyManagerStoragePath = /storage/dapperProxyManager
+            let proxyCap = dapper.capabilities.storage.issue<auth(DapperOffersV2.ProxyManager) &{DapperOffersV2.DapperOfferManager, DapperOffersV2.DapperOfferProxyManager}>(DapperOffersV2.DapperOffersStoragePath)
+            dapper.storage.save(proxyCap, to: proxyManagerStoragePath)
         }
-
-        // if there are no capabilities created for that storage path
-        // or if existing capability is no longer valid, issue a new one
-        if proxyManagerCap == nil || proxyManagerCap?.check() ?? false {
-            proxyManagerCap = signer.capabilities.storage.issue<auth(DapperOffersV2.ProxyManager) &DapperOffersV2.DapperOffer>(DapperOffersV2.DapperOffersStoragePath)
-        }
-        assert(proxyManagerCap?.check() ?? false, message: "Could not assign proxy manager Capability")
-
-        self.tokenAdminCollection = proxyManagerCap!
-
 
         // Setup Proxy Cancel for Dapper
         let capabilityReceiver = dapper.capabilities.get<&{DapperOffersV2.DapperOfferPublic}>(/public/DapperOffersV2).borrow()
@@ -94,22 +98,14 @@ transaction(
 
 
         // Get the capability to the DUC vault
-        var ducProviderCap: Capability<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>? = nil
-        // check if there is an existing capability/capability controller for the storage path
-        let ducVaultControllers = dapper.capabilities.storage.getControllers(forPath: /storage/dapperUtilityCoinVault)
-        for controller in ducVaultControllers {
-            if let maybeProviderCap = controller.capability as? Capability<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>? {
-                ducProviderCap = maybeProviderCap
-                break
-            }
-        }
-
-        // if there are no capabilities created for that storage path
-        // or if existing capability is no longer valid, issue a new one
-        if ducProviderCap == nil || ducProviderCap?.check() ?? false {
-            ducProviderCap = dapper.capabilities.storage.issue<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(/storage/dapperUtilityCoinVault)
-        }
-        assert(ducProviderCap?.check() ?? false, message: "Could not assign DUC vault Capability")
+		let ducCapStoragePath = /storage/mflDucProvider
+		let copiedDucProvider = dapper.storage.copy<Capability<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>>(from: ducCapStoragePath)
+		if copiedDucProvider?.check() == true {
+  			self.ducVaultRef = copiedDucProvider!
+		} else {
+  			self.ducVaultRef = dapper.capabilities.storage.issue<auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault>(/storage/dapperUtilityCoinVault)
+  			dapper.storage.save(self.ducVaultRef, to: ducCapStoragePath)
+		}
 
         self.ducVaultRef = ducProviderCap!
 
