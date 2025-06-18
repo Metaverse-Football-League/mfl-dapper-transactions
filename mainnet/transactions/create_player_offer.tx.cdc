@@ -134,8 +134,8 @@ transaction(
         let typeId = "A.8ebcbfd516b1da27.MFLPlayer.NFT"
 
 		let offerParamsString: {String: String} = {}
-        offerParamsString.insert(key: "nftId", playerId.toString())
         offerParamsString.insert(key: "resolver", "0")
+        offerParamsString.insert(key: "nftId", playerId.toString())
         offerParamsString.insert(key: "_type", "NFT")
         offerParamsString.insert(key: "typeId", typeId)
         offerParamsString.insert(key: "marketplace", "MFL")
