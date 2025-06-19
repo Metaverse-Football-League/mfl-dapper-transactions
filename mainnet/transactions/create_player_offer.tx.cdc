@@ -94,8 +94,6 @@ transaction(
   			dapper.storage.save(self.ducVaultRef, to: ducCapStoragePath)
 		}
 
-        self.ducVaultRef = ducProviderCap!
-
         assert(self.ducVaultRef.check() != nil, message: "Missing or mis-typed DapperUtilityCoin provider")
 
         self.resolverCapability = MFLOffersResolver.getResolverCap()
