@@ -3,8 +3,6 @@ import FungibleToken from 0xf233dcee88fe0abe
 import OffersV2 from 0xb8ea91944fd51c43
 import DapperOffersV2 from 0xb8ea91944fd51c43
 import MetadataViews from 0x1d7e57aa55817448
-import OffersV2 from 0x8a5f647e58dde1ee
-import DapperOffersV2 from 0x8a5f647e58dde1ee
 import MFLPlayer from 0x8ebcbfd516b1da27
 import DapperUtilityCoin from 0xead892083b3e2c6c
 
