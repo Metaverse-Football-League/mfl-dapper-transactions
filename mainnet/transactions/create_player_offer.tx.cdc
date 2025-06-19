@@ -66,19 +66,6 @@ transaction(
 		   signer.storage.save(self.tokenAdminCollection, to: proxyStoragePath)
 		}
 
-		if dapper.storage.borrow<&DapperOffersV2.DapperOffer>(from: DapperOffersV2.DapperOffersStoragePath) == nil {Add commentMore actions
-            let dapperOffer <- DapperOffersV2.createDapperOffer()
-            dapper.storage.save(<-dapperOffer, to: DapperOffersV2.DapperOffersStoragePath)
-            dapper.capabilities.publish(
-                dapper.capabilities.storage.issue<&{DapperOffersV2.DapperOfferPublic}>(DapperOffersV2.DapperOffersStoragePath),
-                at: DapperOffersV2.DapperOffersPublicPath
-            )
-
-            let proxyManagerStoragePath = /storage/dapperProxyManager
-            let proxyCap = dapper.capabilities.storage.issue<auth(DapperOffersV2.ProxyManager) &{DapperOffersV2.DapperOfferManager, DapperOffersV2.DapperOfferProxyManager}>(DapperOffersV2.DapperOffersStoragePath)
-            dapper.storage.save(proxyCap, to: proxyManagerStoragePath)
-        }
-
         // Setup Proxy Cancel for Dapper
         let capabilityReceiver = dapper.capabilities.get<&{DapperOffersV2.DapperOfferPublic}>(/public/DapperOffersV2).borrow()
             ?? panic("Could not borrow capability receiver reference")
