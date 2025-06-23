@@ -43,7 +43,6 @@ transaction(nftID: UInt64, offerId: UInt64, dapperOfferAddress: Address) {
     }
 
     execute {
-        // delete the offer
         self.dapperOffer.cleanup(offerId: offerId)
     }
 }
