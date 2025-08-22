@@ -1,5 +1,5 @@
 import MetadataViews from 0x631e88ae7f1d7c20
-import NFTStorefrontV2 from 0x94b06cfca1d8a476
+import NFTStorefrontV2 from 0x2d55b98eb200daef
 import MFLPack from 0x683564e46977788a
 
 access(all)

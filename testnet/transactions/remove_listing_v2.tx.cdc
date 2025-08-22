@@ -1,4 +1,4 @@
-import NFTStorefrontV2 from 0x94b06cfca1d8a476
+import NFTStorefrontV2 from 0x2d55b98eb200daef
 
 /// Transaction to facilitate the removal of listing by the listing owner. Listing owner should provide the
 /// `listingResourceID` that needs to be removed.
