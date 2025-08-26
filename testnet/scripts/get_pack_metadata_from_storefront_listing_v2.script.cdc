@@ -32,7 +32,7 @@ access(all)
 fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64): PurchaseData {
 
     let account = getAccount(storefrontAddress)
-    let marketCollectionRef = account.capabilities.borrow<&{NFTStorefrontV2.Storefront}>(
+    let marketCollectionRef = account.capabilities.borrow<&{NFTStorefrontV2.StorefrontPublic}>(
            NFTStorefrontV2.StorefrontPublicPath
        ) ?? panic("Could not borrow Storefront")
 
@@ -44,7 +44,7 @@ fun main(storefrontAddress: Address, merchantAccountAddress: Address, listingRes
     let collection = account.capabilities.borrow<&MFLPack.Collection>(MFLPack.CollectionPublicPath)
         ?? panic("Could not borrow a reference to the collection")
 
-	let nft = collectionRef.borrowNFT(listingDetails.nftID)!
+	let nft = collection.borrowNFT(listingDetails.nftID)!
     let displayView = nft.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display
 
 	let purchaseData = PurchaseData(

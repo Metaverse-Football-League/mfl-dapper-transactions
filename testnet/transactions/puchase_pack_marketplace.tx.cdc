@@ -7,8 +7,8 @@ import NFTStorefrontV2 from 0x2d55b98eb200daef
 // This transaction purchases a Pack on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This transaction
 // will also initialize the buyer's Pack collection on their account if it has not already been initialized.
 transaction(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
-    let paymentVault: @{FungibleToken.Vault}
     let nftCollection: &MFLPack.Collection
+    let paymentVault: @{FungibleToken.Vault}
     let storefront: &{NFTStorefrontV2.StorefrontPublic}
     let listing: &{NFTStorefrontV2.ListingPublic}
     let salePrice: UFix64
