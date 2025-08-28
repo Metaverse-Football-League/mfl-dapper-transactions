@@ -15,7 +15,7 @@ transaction(
 	let storefront: auth(NFTStorefrontV2.CreateListing, NFTStorefrontV2.RemoveListing) &NFTStorefrontV2.Storefront
 	let dappAddress: Address
 
-    prepare(dapp: &Account, seller: auth(BorrowValue, CopyValue, LoadValue, SaveValue, IssueStorageCapabilityController, PublishCapability) &Account) {
+    prepare(dapp: &Account, seller: auth(BorrowValue, CopyValue, LoadValue, SaveValue, IssueStorageCapabilityController, PublishCapability, GetStorageCapabilityController) &Account) {
         self.dappAddress = dapp.address
 
         // If the account doesn't already have a Storefront
