@@ -40,20 +40,22 @@ transaction(
         assert(self.sellerPaymentReceiver.check(), message: "Missing or mis-typed DapperUtilityCoin receiver")
 
     	// Get a capability to access the user's NFT collection.
+		var nftProviderCap: Capability<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>? = nil
         let nftProviderControllers = seller.capabilities.storage.getControllers(forPath: MFLPack.CollectionStoragePath)
         for controller in nftProviderControllers {
             if let maybeProviderCap = controller.capability as? Capability<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>? {
-                self.nftProviderCap = maybeProviderCap
+                nftProviderCap = maybeProviderCap
                 break
             }
         }
 
         // if there are no capabilities created for that storage path
         // or if existing capability is no longer valid, issue a new one
-        if self.nftProviderCap == nil || self.nftProviderCap?.check() ?? false {
-            self.nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>(MFLPack.CollectionStoragePath)
+        if nftProviderCap == nil || nftProviderCap?.check() ?? false {
+            nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>(MFLPack.CollectionStoragePath)
         }
-        assert(self.nftProviderCap.check(), message: "Missing or mis-typed collection provider")
+        assert(nftProviderCap.check(), message: "Missing or mis-typed collection provider")
+		self.nftProviderCap = nftProviderCap!
 
         self.storefront = seller.storage.borrow<auth(NFTStorefrontV2.CreateListing, NFTStorefrontV2.RemoveListing) &NFTStorefrontV2.Storefront>(
                 from: NFTStorefrontV2.StorefrontStoragePath
