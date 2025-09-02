@@ -54,7 +54,7 @@ transaction(
         if nftProviderCap == nil || nftProviderCap?.check() ?? false {
             nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>(MFLPack.CollectionStoragePath)
         }
-        assert(nftProviderCap.check(), message: "Missing or mis-typed collection provider")
+        assert(nftProviderCap?.check() ?? false, message: "Missing or mis-typed collection provider")
 		self.nftProviderCap = nftProviderCap!
 
         self.storefront = seller.storage.borrow<auth(NFTStorefrontV2.CreateListing, NFTStorefrontV2.RemoveListing) &NFTStorefrontV2.Storefront>(
