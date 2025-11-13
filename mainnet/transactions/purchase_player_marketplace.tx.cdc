@@ -8,12 +8,12 @@ import NFTStorefront from 0x4eb8a10cb9f87357
 // will also initialize the buyer's Player collection on their account if it has not already been initialized.
 transaction(storefrontAddress: Address, merchantAccountAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @{FungibleToken.Vault}
+    let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
     let nftCollection: &MFLPlayer.Collection
     let storefront: &{NFTStorefront.StorefrontPublic}
     let listing: &{NFTStorefront.ListingPublic}
     let salePrice: UFix64
     let balanceBeforeTransfer: UFix64
-    let mainDapperUtilityCoinVault: auth(FungibleToken.Withdraw) &DapperUtilityCoin.Vault
 
     prepare(dapper: auth(BorrowValue) &Account, buyer: auth(BorrowValue, IssueStorageCapabilityController, PublishCapability, UnpublishCapability, SaveValue) &Account) {
         // Initialize the MFLPlayer collection if the buyer does not already have one
