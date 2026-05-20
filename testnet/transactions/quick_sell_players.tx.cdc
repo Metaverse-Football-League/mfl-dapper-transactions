@@ -22,7 +22,7 @@ transaction(playerIds: [UInt64]) {
     }
 
     execute {
-        let tokens <- self.senderRef.batchWithdraw(ids: ids)
+        let tokens <- self.senderRef.batchWithdraw(ids: playerIds)
 
         let ids = tokens.getIDs()
 
