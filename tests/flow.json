@@ -1,0 +1,99 @@
+{
+ "networks": {
+  "testing": "127.0.0.1:3569",
+  "emulator": "127.0.0.1:3569"
+ },
+ "accounts": {},
+ "contracts": {
+  "FungibleToken": {
+   "source": "./.contracts/_libs/FungibleToken.cdc",
+   "aliases": {
+    "testing": "0000000000000002"
+   }
+  },
+  "NonFungibleToken": {
+   "source": "./.contracts/_libs/NonFungibleToken.cdc",
+   "aliases": {
+    "testing": "0000000000000001"
+   }
+  },
+  "MetadataViews": {
+   "source": "./.contracts/_libs/MetadataViews.cdc",
+   "aliases": {
+    "testing": "0000000000000001"
+   }
+  },
+  "ViewResolver": {
+   "source": "./.contracts/_libs/ViewResolver.cdc",
+   "aliases": {
+    "testing": "0000000000000001"
+   }
+  },
+  "FungibleTokenMetadataViews": {
+   "source": "./.contracts/_libs/FungibleTokenMetadataViews.cdc",
+   "aliases": {
+    "testing": "0000000000000002"
+   }
+  },
+  "Burner": {
+   "source": "./.contracts/_libs/Burner.cdc",
+   "aliases": {
+    "testing": "0000000000000001"
+   }
+  },
+  "DapperUtilityCoin": {
+   "source": "./.contracts/_libs/DapperUtilityCoin.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "TokenForwarding": {
+   "source": "./.contracts/_libs/TokenForwarding.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "NFTStorefront": {
+   "source": "./.contracts/_libs/NFTStorefront.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "NFTStorefrontV2": {
+   "source": "./.contracts/_libs/NFTStorefrontV2.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "MFLAdmin": {
+   "source": "./.contracts/core/MFLAdmin.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "MFLPackTemplate": {
+   "source": "./.contracts/packs/MFLPackTemplate.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "MFLViews": {
+   "source": "./.contracts/views/MFLViews.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "MFLPlayer": {
+   "source": "./.contracts/players/MFLPlayer.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  },
+  "MFLClub": {
+   "source": "./.contracts/clubs/MFLClub.cdc",
+   "aliases": {
+    "testing": "0000000000000007"
+   }
+  }
+ }
+}
