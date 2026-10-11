@@ -1,2 +1,4 @@
 .idea/
 .vscode/
+tests/cadence
+tests/.contracts
