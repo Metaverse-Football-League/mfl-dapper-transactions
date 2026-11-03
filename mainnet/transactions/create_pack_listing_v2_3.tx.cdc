@@ -56,7 +56,7 @@ transaction(
 
         // if there are no capabilities created for that storage path
         // or if existing capability is no longer valid, issue a new one
-        if nftProviderCap == nil {
+        if nftProviderCap == nil || !nftProviderCap!.check() {
             nftProviderCap = seller.capabilities.storage.issue<auth(NonFungibleToken.Withdraw) &MFLPack.Collection>(MFLPack.CollectionStoragePath)
         }
         assert(nftProviderCap?.check() ?? false, message: "Missing or mis-typed collection provider")
